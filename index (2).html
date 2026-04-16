@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Text Summarizer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      padding: 30px 16px;
+      color: #1a1a2e;
+    }
+
+    .wrap { max-width: 820px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 32px; }
+
+    .icon {
+      width: 60px; height: 60px;
+      background: #4f46e5;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+
+    .icon svg { width: 30px; height: 30px; fill: white; }
+
+    h1 { font-size: 2rem; font-weight: 700; color: #1a1a2e; }
+    .subtitle { color: #6b7280; margin-top: 6px; font-size: 0.95rem; }
+
+    .badge {
+      display: inline-block;
+      background: #d1fae5; color: #065f46;
+      border: 1px solid #6ee7b7;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+      padding: 3px 14px; margin-top: 8px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #1a1a2e;
+      resize: vertical;
+      outline: none;
+      line-height: 1.65;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: #4f46e5; }
+    textarea::placeholder { color: #9ca3af; }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .wc { font-size: 0.78rem; color: #9ca3af; }
+
+    .clr {
+      font-size: 0.78rem; color: #6b7280;
+      background: none; border: none; cursor: pointer;
+      padding: 2px 8px; border-radius: 4px;
+    }
+
+    .clr:hover { background: #f3f4f6; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+
+    .opt label { display: block; font-size: 0.82rem; font-weight: 600; color: #6b7280; margin-bottom: 6px; }
+
+    select {
+      width: 100%;
+      padding: 9px 34px 9px 12px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #1a1a2e;
+      background: white;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    select:focus { border-color: #4f46e5; }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:hover { background: #4338ca; }
+    .btn:active { transform: scale(0.99); }
+
+    .result { display: none; }
+
+    .result-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .ok { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #059669; }
+
+    .acts { display: flex; gap: 8px; }
+
+    .abtn {
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-family: inherit;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: white;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .abtn:hover { background: #f3f4f6; color: #1a1a2e; }
+    .abtn.done { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+
+    .out {
+      font-size: 0.97rem;
+      line-height: 1.8;
+      color: #1a1a2e;
+    }
+
+    .stats {
+      display: flex; gap: 24px;
+      margin-top: 18px; padding-top: 14px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .st { text-align: center; }
+    .sv { font-size: 1.3rem; font-weight: 700; color: #4f46e5; }
+    .sl { font-size: 0.72rem; color: #9ca3af; margin-top: 2px; }
+
+    .err {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      color: #dc2626;
+      margin-top: 14px;
+      display: none;
+    }
+
+    footer { text-align: center; margin-top: 40px; font-size: 0.78rem; color: #9ca3af; }
+
+    @media (max-width: 540px) {
+      .grid2 { grid-template-columns: 1fr; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>
+    </div>
+    <h1>Text Summarizer</h1>
+    <p class="subtitle">Extractive NLP summarization — runs entirely in your browser</p>
+    <div class="badge">No API &bull; No Internet Required &bull; 100% Free</div>
+  </header>
+
+  <div class="card">
+    <div class="label">Paste your text</div>
+    <textarea id="inp" placeholder="Paste any article, essay, report, or long text here...&#10;&#10;Works best with 5+ sentences."></textarea>
+    <div class="row">
+      <span class="wc" id="wc">0 words</span>
+      <button class="clr" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Options</div>
+    <div class="grid2">
+      <div class="opt">
+        <label>Summary length</label>
+        <select id="len">
+          <option value="1">Very short (1 sentence)</option>
+          <option value="2">Short (2 sentences)</option>
+          <option value="3" selected>Medium (3 sentences)</option>
+          <option value="5">Long (5 sentences)</option>
+          <option value="7">Detailed (7 sentences)</option>
+        </select>
+      </div>
+      <div class="opt">
+        <label>Focus on</label>
+        <select id="focus">
+          <option value="general">General (balanced)</option>
+          <option value="first">Opening ideas</option>
+          <option value="keywords">Keyword-rich sentences</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="summarize()">Summarize</button>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <div class="card result" id="res">
+    <div class="result-head">
+      <span class="ok">Summary Ready</span>
+      <div class="acts">
+        <button class="abtn" id="cpBtn" onclick="copyOut()">Copy</button>
+        <button class="abtn" onclick="dlOut()">Download</button>
+      </div>
+    </div>
+    <div class="out" id="out"></div>
+    <div class="stats">
+      <div class="st"><div class="sv" id="s1">—</div><div class="sl">Original words</div></div>
+      <div class="st"><div class="sv" id="s2">—</div><div class="sl">Summary words</div></div>
+      <div class="st"><div class="sv" id="s3">—</div><div class="sl">Compression</div></div>
+    </div>
+  </div>
+
+  <footer>Text Summarizer &mdash; Pure JavaScript NLP &mdash; No API Required &mdash; Internship Project</footer>
+</div>
+
+<script>
+  // Stop words to ignore when scoring
+  const STOP = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with',
+    'is','are','was','were','be','been','being','have','has','had','do','does','did','will',
+    'would','could','should','may','might','shall','can','this','that','these','those','i',
+    'we','you','he','she','it','they','my','our','your','his','her','its','their','what',
+    'which','who','how','when','where','why','not','no','so','as','if','by','from','up',
+    'about','into','through','during','before','after','above','below','between','each',
+    'than','then','both','also','just','more','very','there','here','now','only','also']);
+
+  document.getElementById('inp').addEventListener('input', function() {
+    const w = words(this.value);
+    document.getElementById('wc').textContent = w + ' word' + (w !== 1 ? 's' : '');
+  });
+
+  function words(t) { return t.trim() === '' ? 0 : t.trim().split(/\s+/).length; }
+
+  function clearAll() {
+    document.getElementById('inp').value = '';
+    document.getElementById('wc').textContent = '0 words';
+    document.getElementById('res').style.display = 'none';
+    document.getElementById('err').style.display = 'none';
+  }
+
+  // Split text into sentences
+  function getSentences(text) {
+    // Split on period/exclamation/question followed by space and capital letter
+    const raw = text.match(/[^.!?]+[.!?]+/g) || [text];
+    return raw.map(s => s.trim()).filter(s => s.split(/\s+/).length >= 4);
+  }
+
+  // Score sentences using term frequency
+  function scoreSentences(sentences, focus) {
+    // Build word frequency map
+    const freq = {};
+    sentences.forEach(s => {
+      s.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).forEach(w => {
+        if (w.length > 2 && !STOP.has(w)) freq[w] = (freq[w] || 0) + 1;
+      });
+    });
+
+    // Score each sentence
+    return sentences.map((s, idx) => {
+      const ws = s.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+      let score = ws.reduce((sum, w) => sum + (freq[w] || 0), 0) / (ws.length || 1);
+
+      // Boost first and last sentences slightly (topic sentences)
+      if (focus === 'general') {
+        if (idx === 0) score *= 1.5;
+        if (idx === sentences.length - 1) score *= 1.2;
+      } else if (focus === 'first') {
+        score *= Math.max(1, 2 - idx * 0.3);
+      } else if (focus === 'keywords') {
+        // Pure frequency scoring — no position bonus
+      }
+
+      return { text: s, score, idx };
+    });
+  }
+
+  function summarize() {
+    const raw = document.getElementById('inp').value.trim();
+    const err = document.getElementById('err');
+    err.style.display = 'none';
+
+    if (!raw) { err.textContent = 'Please paste some text first.'; err.style.display = 'block'; return; }
+    if (words(raw) < 30) { err.textContent = 'Please enter at least 30 words.'; err.style.display = 'block'; return; }
+
+    const n = parseInt(document.getElementById('len').value);
+    const focus = document.getElementById('focus').value;
+
+    const sentences = getSentences(raw);
+
+    if (sentences.length < 2) {
+      err.textContent = 'Could not detect multiple sentences. Make sure the text has proper punctuation (. ! ?)';
+      err.style.display = 'block';
+      return;
+    }
+
+    const take = Math.min(n, sentences.length);
+    const scored = scoreSentences(sentences, focus);
+
+    // Pick top N by score, then sort back into original order
+    const top = [...scored]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, take)
+      .sort((a, b) => a.idx - b.idx)
+      .map(s => s.text);
+
+    const summary = top.join(' ');
+
+    document.getElementById('out').textContent = summary;
+    document.getElementById('s1').textContent = words(raw);
+    document.getElementById('s2').textContent = words(summary);
+    const pct = Math.round((1 - words(summary) / words(raw)) * 100);
+    document.getElementById('s3').textContent = pct + '%';
+
+    const res = document.getElementById('res');
+    res.style.display = 'block';
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function copyOut() {
+    await navigator.clipboard.writeText(document.getElementById('out').textContent);
+    const btn = document.getElementById('cpBtn');
+    btn.textContent = 'Copied!'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 2000);
+  }
+
+  function dlOut() {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([document.getElementById('out').textContent], { type: 'text/plain' }));
+    a.download = 'summary.txt'; a.click();
+  }
+</script>
+</body>
+</html>
